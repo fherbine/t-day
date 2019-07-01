@@ -8,6 +8,8 @@ __author__  = 'fherbine'
 from kivy.app import App
 from kivy.properties import ObjectProperty
 
+import config
+
 
 class TDayApp(App):
     screenmanager = ObjectProperty(rebind=True)
