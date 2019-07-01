@@ -7,6 +7,10 @@ FloatLayout:
         #settings
         #reminders
 
+    MenuButton:
+        pos_hint: {'center': (.95, .95)}
+        size_hint: .03, .03
+
 <StyledLabel@Label>:
 
 
@@ -14,3 +18,24 @@ FloatLayout:
 
 
 <ImageButton@ButtonBehavior+Image>:
+
+
+<MenuButton@ButtonBehavior+Widget>:
+    color: 1, 1, 1, 1
+
+    canvas.before:
+        Color:
+            rgba: root.color
+        Line:
+            points: self.x, self.y, self.right, self.y
+            width: root.height / 10
+        Color:
+            rgba: root.color
+        Line:
+            points: self.x, self.center_y, self.right, self.center_y
+            width: root.height / 10
+        Color:
+            rgba: root.color
+        Line:
+            points: self.x, self.top, self.right, self.top
+            width: root.height / 10
