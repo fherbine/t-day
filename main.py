@@ -10,6 +10,8 @@ from kivy.properties import ObjectProperty
 
 import config
 
+from screens import * # noqa
+
 
 class TDayApp(App):
     screenmanager = ObjectProperty(rebind=True)

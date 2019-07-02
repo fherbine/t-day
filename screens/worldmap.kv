@@ -1,7 +1,11 @@
+#:import MapView kivy.garden.mapview.MapView
+
 <MapScreen>:
     FloatLayout:
-        # mapview
-            #>> Full screen
+        WorldMapView:
+            #min_zoom: 11
+            lat: 48.8534
+            lon: 2.3488
         # meetingsmenu -- resizable
             #>> Resizable
         # button to repositionnate
