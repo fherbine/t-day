@@ -59,3 +59,142 @@ FloatLayout:
         Line:
             points: self.x, self.top, self.right, self.top
             width: root.height / 10
+
+
+<StyledSpinner@FloatLayout>:
+    values: []
+
+    Spinner:
+        id: spinner
+        dropdown_cls: Factory.StyledDropDown
+        option_cls: Factory.StyledSpinnerOption
+        values: [value for value in root.values if value != self.text] if root.values and self.text else []
+        text: root.values[0] if root.values else ''
+        font_size: sp(19)
+        pos_hint: {'center': (.5, .5)}
+
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            BorderImage:
+                source: 'data/images/shadow.png'
+                border: 18, 18, 18, 18
+                pos: [xy - dp(4) for xy in self.pos]
+                size: [wh + dp(12) for wh in self.size]
+            Color:
+                rgba: rgba('#f3f3f3')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Color:
+                rgba: rgba('#ebebeb')
+            Line:
+                points:
+                    (
+                    self.x, self.y,
+                    self.right, self.y,
+                    self.right, self.top,
+                    self.x, self.top,
+                    self.x, self.y,
+                    )
+
+        canvas:
+            Clear:
+            Color:
+                rgba: rgba('#000000')
+            Rectangle:
+                pos: [cxy - ts / 2 for cxy, ts in zip(self.center, self.texture_size)]
+                size: self.texture_size
+                texture: self.texture
+
+    Image:
+        source: 'data/images/down_arrow.png'
+        pos_hint: {'center_y': .5, 'right': .95}
+        size_hint: None, None
+        size: self.texture_size
+
+        canvas.before:
+            PushMatrix:
+            Rotate:
+                origin: self.center
+                angle: 0 if not spinner.is_open else 180
+
+        canvas.after:
+            PopMatrix:
+
+
+<StyledDropDown@DropDown>:
+
+
+<StyledSpinnerOption@SpinnerOption+StyledLabel>:
+    font_size: sp(19)
+
+    canvas.before:
+        Color:
+            rgba: rgba('#f3f3f3')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    canvas:
+        Clear:
+        Color:
+            rgba: rgba('#000000')
+        Rectangle:
+            pos: [cxy - ts / 2 for cxy, ts in zip(self.center, self.texture_size)]
+            size: self.texture_size
+            texture: self.texture
+
+<StyledTextInput@BoxLayout>:
+    focused: False
+    text: textinput.text
+
+    canvas.before:
+        Color:
+        BorderImage:
+            source: 'data/images/shadow.png'
+            border: 18, 18, 18, 18
+            pos: [xy - dp(4) for xy in self.pos]
+            size: [wh + dp(12) for wh in self.size]
+        Color:
+            rgba: rgba('#118eba88') if self.focused else rgba('#ebebeb')
+        RoundedRectangle:
+            pos: [xy - dp(1) for xy in self.pos]
+            size: [wh + dp(2) for wh in self.size]
+            radius: (dp(5),)
+        Color:
+            rgba: rgba('#f2f2f2')
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: (dp(5),)
+
+    TextInput:
+        id: textinput
+        multiline: False
+        write_tab: False
+        input_filter: 'float'
+        cursor_color: 0, 0, 0, 1
+        background_color: 0, 0, 0, 0
+        foregroud_color: rgba('ff0000')
+        text_size: self.width, None
+        halign: 'center'
+        font_size: sp(19)
+        padding_y: (self.height - self.font_size) / 2, 0
+        padding_x: dp(20)
+        on_focus: root.focused = self.focus
+
+
+<SubmitButton@LabelButton>:
+    font_size: sp(15)
+    disabled_color: 1, 1, 1, 1
+    size_hint: None, None
+    size: [ts + dp(35) for ts in self.texture_size]
+    opacity: 1 if self.state == 'normal' else .7
+
+    canvas.before:
+        Color:
+            rgba: rgba('#128fbd') if not self.disabled else rgba('#d7d8da')
+        Rectangle:
+            pos: self.pos
+            size: self.size
