@@ -4,19 +4,49 @@
     FloatLayout:
         WorldMapView:
             id: mapview
+            add_meeting: False
             #min_zoom: 11
             lat: 48.8534
             lon: 2.3488
+            on_add_meeting:
+                popup = Factory.AddMeetingMenu()
+                popup.open()
 
-        # meetingsmenu -- resizable
-            #>> Resizable
         AddMarkerButton:
             pos_hint: {'center': (.05, .95)}
 
             on_press: mapview.marker_triggered = True
+
+        #AddMeetingMenu:
+        #    pos_hint: {'center_x': .5}
+        #    size_hint_y: .7
+        #    y: -(root.height) if not mapview.add_meeting else 0
+        #    opacity: 1 if mapview.add_meeting else 0
+        #    disabled: True if not mapview.add_meeting else False
         # button to repositionnate
 
 <AddMarkerButton@ImageButton>:
     source: 'data/images/add_marker.png'
     size_hint: None, None
     size: self.texture_size
+
+<AddMeetingMenu>:
+    canvas:
+        Clear:
+
+    FloatLayout:
+        BoxLayout:
+            pos_hint: {'y': 0}
+            size_hint_y: .6
+
+            canvas.before:
+                Color:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: 'add_event'
+
+            Button:
+                text: 'cancel'

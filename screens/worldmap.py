@@ -4,7 +4,9 @@ Home screen with meetings location and main UX.
 '''
 
 
+from kivy.animation import Animation
 from kivy.clock import mainthread
+from kivy.factory import Factory
 from kivy.garden.mapview import (
     MapMarker,
     MapSource,
@@ -16,6 +18,7 @@ from kivy.properties import (
     ListProperty,
     NumericProperty,
 )
+from kivy.uix.modalview import ModalView
 from kivy.uix.screenmanager import Screen
 
 
@@ -41,6 +44,7 @@ class WorldMapView(MapView):
     '''
 
     # internal
+    add_meeting = BooleanProperty(False)
     marker_triggered = BooleanProperty(False)
     bounds = ListProperty([0, 0, 0, 0])
     map_markers = ListProperty()
@@ -59,6 +63,7 @@ class WorldMapView(MapView):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos) and self.marker_triggered:
             self.add_meeting_marker(touch)
+            self.add_meeting = True
             self.marker_triggered = False
 
         return super().on_touch_down(touch)
@@ -101,5 +106,17 @@ class WorldMapView(MapView):
         source = MapSource(max_zoom=self.max_zoom, min_zoom=self.min_zoom)
         self.map_source = source
 
+class AddMeetingMenu(ModalView):
+    def open(self, *args, **kwargs):
+        super().open(animation=False, *args, **kwargs)
+
+    def on_open(self, *args):
+        self.pos_hint = {'top': 0}
+        open_animation = Animation(pos_hint={'top': 1}, duration=.5)
+        open_animation.start(self)
+
+
+
+Factory.register('AddMeetingMenu', cls=AddMeetingMenu)
 
 Builder.load_file('screens/worldmap.kv')
