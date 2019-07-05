@@ -1,6 +1,8 @@
 #:import MapView kivy.garden.mapview.MapView
 
 <MapScreen>:
+    mapview: mapview
+
     FloatLayout:
         WorldMapView:
             id: mapview
@@ -45,8 +47,9 @@
                     pos: self.pos
                     size: self.size
 
-            Button:
-                text: 'add_event'
+            SubmitButton:
+                text: 'add event'.upper()
 
-            Button:
-                text: 'cancel'
+            SubmitButton:
+                text: 'cancel'.upper()
+                on_press: root.dismiss()
