@@ -6,11 +6,13 @@ Home screen with meetings location and main UX.
 
 from kivy.clock import mainthread
 from kivy.garden.mapview import (
+    MapMarker,
     MapSource,
     MapView,
 )
 from kivy.lang import Builder
 from kivy.properties import (
+    BooleanProperty,
     ListProperty,
     NumericProperty,
 )
@@ -21,12 +23,33 @@ class MapScreen(Screen):
     pass
 
 class WorldMapView(MapView):
-    '''Modified version of Kivy Garden MapView.'''
+    '''Modified version of Kivy Garden MapView.
 
-    default_zoom = NumericProperty(11)
-    min_zoom = NumericProperty()
-    max_zoom = NumericProperty(19)
+    Meetings ListProperty :attr: self.meetings
+    [{
+        'coordinate': {'lat': x, 'lon': y},
+        'datetime': 'ISOFORMAT_DATETIME',
+        'level': 1-3
+    }]
+
+    map_markers ListProperty :attr: self.map_markers
+    [
+        <MapMarker object>,
+        <MapMarker object>,
+        ...
+    ]
+    '''
+
+    # internal
+    marker_triggered = BooleanProperty(False)
     bounds = ListProperty([0, 0, 0, 0])
+    map_markers = ListProperty()
+    default_zoom = NumericProperty(11)
+    max_zoom = NumericProperty(19)
+    min_zoom = NumericProperty()
+
+    # external
+    meetings = ListProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -34,13 +57,20 @@ class WorldMapView(MapView):
         self.init_map()
 
     def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            # add marker ?
-            pass
+        if self.collide_point(*touch.pos) and self.marker_triggered:
+            self.add_meeting_marker(touch)
+            self.marker_triggered = False
+
         return super().on_touch_down(touch)
+
+    def add_meeting_marker(self, touch):
+        coordinate = self.get_latlon_at(*touch.pos, self.zoom)
+        map_marker = MapMarker(lat=coordinate.lat, lon=coordinate.lon)
+        self.add_marker(map_marker)
 
     @mainthread
     def init_map(self):
+        '''Map initialisation.'''
         #XXX: Hack stuff to set defaultzoom
         self.zoom = self.default_zoom
         self.lat = 48.8534
