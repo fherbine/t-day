@@ -1,6 +1,7 @@
 import json
 
 from kivy.event import EventDispatcher
+from kivy.logger import Logger
 from kivy.properties import DictProperty
 
 class Meetings(EventDispatcher):
@@ -36,11 +37,15 @@ class Meetings(EventDispatcher):
         :comment: A short description of the event.
         '''
         m_id = len(self.meetings)
-        self.meetings[str(m_id)] = {
+        meeting = {
             'priority_level': priority_level,
             'coordinate': coordinate,
             'data': kwargs,
         }
+        self.meetings[str(m_id)] = meeting
+
+        Logger.info('Meetings - added: ' + repr(meeting) + 'with id: ' + m_id)
+
         self.save_meetings()
 
     def save_meetings(self):
@@ -48,7 +53,11 @@ class Meetings(EventDispatcher):
         with open('meetings.json', 'w+') as meetings_file:
             json.dump(self.meetings, meetings_file)
 
+        Logger.info('Meetings - saved: ' + repr(self.meetings))
+
     def load_meetings(self):
         '''Reading into meetings.json file to parse it into meetings prop.'''
         with open('meetings.json', 'r') as meetings_file:
             self.meetings = json.load(meetings_file)
+
+        Logger.info('Meetings - loaded: ' + repr(self.meetings))
