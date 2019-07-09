@@ -149,6 +149,7 @@ FloatLayout:
 <StyledTextInput@BoxLayout>:
     focused: False
     text: textinput.text
+    multiline: False
 
     canvas.before:
         Color:
@@ -172,16 +173,15 @@ FloatLayout:
 
     TextInput:
         id: textinput
-        multiline: False
+        multiline: root.multiline
         write_tab: False
-        input_filter: 'float'
         cursor_color: 0, 0, 0, 1
         background_color: 0, 0, 0, 0
         foregroud_color: rgba('ff0000')
         text_size: self.width, None
         halign: 'center'
         font_size: sp(19)
-        padding_y: (self.height - self.font_size) / 2, 0
+        padding_y: (self.height - self.font_size) / 2 if not self.multiline else 0, 0
         padding_x: dp(20)
         on_focus: root.focused = self.focus
 

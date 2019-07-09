@@ -44,7 +44,10 @@ class Meetings(EventDispatcher):
         }
         self.meetings[str(m_id)] = meeting
 
-        Logger.info('Meetings - added: ' + repr(meeting) + 'with id: ' + m_id)
+        Logger.info('Meetings - added: {meeting} with id: "{mid}"'.format(
+            meeting=repr(meeting),
+            mid=m_id,
+        ))
 
         self.save_meetings()
 
