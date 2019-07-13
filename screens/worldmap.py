@@ -152,8 +152,8 @@ class AddMeetingMenu(ModalView):
     tmp_marker = ObjectProperty(allownone=True)
 
     def on_open(self, *args):
-        self.pos_hint = {'top': 0}
-        open_animation = Animation(pos_hint={'top': 1}, duration=.5)
+        self.pos_hint = {'x': 1}
+        open_animation = Animation(pos_hint={'x': 0}, duration=.5)
         open_animation.start(self)
 
     def add_meeting(self):

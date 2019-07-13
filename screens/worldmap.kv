@@ -43,7 +43,7 @@
     level: int(level.spinner_option) if level.spinner_option else 0
     target: None
     tmp_marker: None
-    pos_hint: {'top': 0}
+    pos_hint: {'x': 1}
 
     canvas:
         Clear:
@@ -52,7 +52,7 @@
         BoxLayout:
             orientation: 'vertical'
             padding: (dp(20),)
-            pos_hint: {'y': 0}
+            pos_hint: {'top': 1}
             size_hint_y: .6
             on_touch_down:
                 touch = args[1]
@@ -63,7 +63,7 @@
                 Color:
                     a: .1
                 Rectangle:
-                    pos: self.x, self.y + self.height
+                    pos: self.x, self.y - self.height
                     size: [wh * 4 for wh in self.size]
                 Color:
                 BorderImage:
