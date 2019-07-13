@@ -40,7 +40,7 @@
 <AddMeetingMenu>:
     title: title.text
     comment: comment.text
-    level: level.spinner_option
+    level: int(level.spinner_option) if level.spinner_option else 0
     target: None
     tmp_marker: None
     pos_hint: {'top': 0}

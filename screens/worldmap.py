@@ -144,7 +144,7 @@ class WorldMapView(MapView):
         self.map_source = source
 
 class AddMeetingMenu(ModalView):
-    priority_level = NumericProperty(3)
+    level = NumericProperty(3)
     coordinate = ObjectProperty(allownone=True)
     title = StringProperty()
     comment = StringProperty()
@@ -162,7 +162,7 @@ class AddMeetingMenu(ModalView):
 
         meetings_controller = app.meetings_controller
         meetings_controller.add_meeting(
-            priority_level=self.priority_level,
+            priority_level=self.level,
             coordinate={
                 'lat': self.coordinate.lat,
                 'lon': self.coordinate.lon
