@@ -23,6 +23,7 @@ from kivy.properties import (
     NumericProperty,
     ObjectProperty,
 )
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.modalview import ModalView
 from kivy.uix.screenmanager import Screen
 
@@ -34,13 +35,55 @@ class MapScreen(Screen):
         if self.mapview is None:
             return
 
+class EventMarker(MapMarker):
+    m_id = StringProperty()
+
+    def on_release(self, *args):
+        if not self.m_id:
+            return
+
+        popup = EventInfoPopup()
+        popup.m_id = self.m_id
+        popup.open()
+
+class EventItemBox(BoxLayout):
+    pass
+
+class EventInfoPopup(ModalView):
+    m_id = StringProperty()
+    container = ObjectProperty()
+
+    def on_m_id(self, *args):
+        if not self.m_id:
+            return
+
+        app = App.get_running_app()
+        meetings_controller = app.meetings_controller
+        meetings = meetings_controller.meetings
+
+        meeting = meetings[self.m_id]
+
+        data = {
+            **meeting.get('data', {}),
+            'priority_level': meeting.get('priority_level'),
+        }
+
+        for key, value in data.items():
+            item = EventItemBox()
+            item.title = str(key)
+            item.content = str(value)
+
+            self.container.add_widget(item)
+
+
+
 class WorldMapView(MapView):
     '''Modified version of Kivy Garden MapView.
 
     map_markers DictProperty :attr: self.map_markers
     {
-        1: <MapMarker object>,
-        2: <MapMarker object>,
+        1: <EventMarker object>,
+        2: <EventMarker object>,
         ...
     {
     '''
@@ -75,7 +118,7 @@ class WorldMapView(MapView):
             *touch.pos,
             self.zoom,
         )
-        self.tmp_map_marker = map_marker = MapMarker(
+        self.tmp_map_marker = map_marker = EventMarker(
             lat=coordinate.lat,
             lon=coordinate.lon,
         )
@@ -89,10 +132,11 @@ class WorldMapView(MapView):
 
         lat, lon = coordinate['lat'], coordinate['lon']
 
-        map_marker = MapMarker(
+        map_marker = EventMarker(
             lat=lat,
             lon=lon
         )
+        map_marker.m_id = m_id
         self.add_marker(map_marker)
         self.map_markers[m_id] = map_marker
 

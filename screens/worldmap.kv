@@ -144,3 +144,36 @@
         disabled: False if not root.textinput else True
         pos_hint: {'center_y': .5}
         size_hint: (1 if not root.textinput else .001), .4
+
+
+<EventInfoPopup>:
+    container: container
+
+    canvas:
+        Clear:
+
+    FloatLayout:
+        BoxLayout:
+            id: container
+            orientation: 'vertical'
+            pos_hint: {'center': (.5, .5)}
+            size_hint: .8, .8
+
+            canvas.before:
+                Color:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+<EventItemBox>:
+    title: ''
+    content: ''
+
+    StyledLabel:
+        text: '{}:'.format(root.title)
+        color: 0, 0, 0, 1
+        bold: True
+
+    StyledLabel:
+        text: root.content
+        color: 0, 0, 0, 1
