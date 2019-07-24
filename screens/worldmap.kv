@@ -1,3 +1,4 @@
+#:import cos math.cos
 #:import MapView kivy.garden.mapview.MapView
 
 <MapScreen>:
@@ -177,3 +178,23 @@
     StyledLabel:
         text: root.content
         color: 0, 0, 0, 1
+
+<LocationMarker>:
+    size_hint: None, None
+    size: dp(50), dp(50)
+
+    canvas:
+        Clear:
+
+    Image:
+        source: 'data/images/location_marker.png'
+        pos_hint: {'center': (.5, .5)}
+        size_hint: None, None
+        size: self.parent.size
+
+    Image:
+        source: 'data/images/location_marker_shadow.png'
+        pos_hint: {'center': (.5, .5)}
+        size_hint: None, None
+        size: self.parent.size
+        opacity: abs(cos(2 * app.time)) - .3

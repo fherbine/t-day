@@ -5,6 +5,8 @@ Home screen with meetings location and main UX.
 
 import datetime # Should be temporary to simumlate time
 
+from plyer import gps
+
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import mainthread
@@ -15,6 +17,7 @@ from kivy.garden.mapview import (
     MapView,
 )
 from kivy.lang import Builder
+from kivy.logger import Logger
 from kivy.properties import (
     BooleanProperty,
     DictProperty,
@@ -24,7 +27,9 @@ from kivy.properties import (
     ObjectProperty,
 )
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.modalview import ModalView
+from kivy.utils import platform
 from kivy.uix.screenmanager import Screen
 
 
@@ -32,8 +37,21 @@ class MapScreen(Screen):
     mapview = ObjectProperty(allownone=True)
 
     def on_mapview(self, *args):
-        if self.mapview is None:
+        mapview = self.mapview
+
+        if mapview is None:
             return
+
+        mapview.init_gps()
+
+    def on_leave(self, *args):
+        mapview = self.mapview
+
+        if mapview is None:
+            return
+
+        mapview.stop_gps()
+
 
 class EventMarker(MapMarker):
     m_id = StringProperty()
@@ -98,6 +116,7 @@ class WorldMapView(MapView):
     min_zoom = NumericProperty()
     preview_coordinate = ObjectProperty(allownone=True)
     tmp_map_marker = ObjectProperty(allownone=True)
+    location_marker = ObjectProperty(allownone=True)
 
 
     def __init__(self, **kwargs):
@@ -163,6 +182,47 @@ class WorldMapView(MapView):
 
         #self.map_source.bounds = self.bounds
 
+    def init_gps(self):
+        try:
+            gps.configure(
+                on_location=self.update_location,
+                on_status=self.on_gps_status,
+            )
+            self._start_gps(1000, 0)
+        except NotImplementedError:
+            Logger.info('GPS: Unavailable on {platform}'.format(
+                platform=platform,
+            ))
+
+    def _start_gps(self, min_time, min_distance):
+        gps.start(min_time, min_distance)
+
+    def stop_gps(self):
+        gps.stop()
+
+    @mainthread
+    def update_location(self, **kwargs):
+        for coordinate in ('lat', 'lon'):
+            setattr(self, coordinate, kwargs.get(coordinate, 0.0))
+
+        self.place_location_marker()
+
+    def place_location_marker(self):
+        if self.location_marker is None:
+            self.location_marker = LocationMarker()
+        else:
+            self.remove_marker(self.location_marker)
+
+        self.location_marker.lat, self.location_marker.lon = self.lat, self.lon
+        self.add_marker(self.location_marker)
+
+    @mainthread
+    def on_gps_status(self, stype, status):
+        Logger.info('GPS: type={stype}\n{status}'.format(
+            stype=stype,
+            status=status,
+        ))
+
     def on_default_zoom(self, *args):
         '''Update map's default zoom.'''
 
@@ -220,6 +280,9 @@ class AddMeetingMenu(ModalView):
             self.target.remove_marker(self.tmp_marker)
 
         self.dismiss()
+
+class LocationMarker(MapMarker, FloatLayout):
+    pass
 
 
 Factory.register('AddMeetingMenu', cls=AddMeetingMenu)
