@@ -9,6 +9,7 @@
             id: mapview
             preview_coordinate: None
             add_meeting: False
+            marker_triggered: False
             #min_zoom: 11
             lat: 48.8534
             lon: 2.3488
@@ -21,14 +22,33 @@
                 popup.open()
 
         AddMarkerButton:
+            target_active: mapview.marker_triggered
             pos_hint: {'center': (.05, .95)}
 
             on_press: mapview.marker_triggered = True
 
+        RecenterButton:
+            pos_hint: {'center': (.95, .1)}
+            disabled: False if mapview.location_marker else True
+
+            on_press:
+                if mapview.location_marker: mapview.center_on(mapview.location_marker.lat, mapview.location_marker.lon)
+
+
 <AddMarkerButton@ImageButton>:
+    target_active: True
     source: 'data/images/add_marker.png'
     size_hint: None, None
-    size: self.texture_size
+    size: list(map(dp, (100, 100)))
+    opacity: .5 if self.disabled else (1 if not self.target_active else .7)
+
+
+<RecenterButton@ImageButton>:
+    source: 'data/images/recenter.png'
+    size_hint: None, None
+    size: list(map(dp, (100, 100)))
+    opacity: .5 if self.disabled else (1 if self.state == 'normal' else .7)
+
 
 <AddMeetingMenu>:
     target: None
