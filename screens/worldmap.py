@@ -248,10 +248,7 @@ class WorldMapView(MapView):
         self.map_source = source
 
 class AddMeetingMenu(ModalView):
-    level = NumericProperty(3)
     coordinate = ObjectProperty(allownone=True)
-    title = StringProperty()
-    comment = StringProperty()
     target = ObjectProperty(allownone=True)
     tmp_marker = ObjectProperty(allownone=True)
 
@@ -265,15 +262,22 @@ class AddMeetingMenu(ModalView):
         app = App.get_running_app()
 
         meetings_controller = app.meetings_controller
+
+        data_container = self.ids.data_container
+        data = data_container.children
+        title = data[1].text
+        comment = data[0].text
+        level = int(data[-1].spinner_option if data[-1].spinner_option else '0')
+
         meetings_controller.add_meeting(
-            priority_level=self.level,
+            priority_level=level,
             coordinate={
                 'lat': self.coordinate.lat,
                 'lon': self.coordinate.lon
                 } if self.coordinate else None,
             datetime=datetime.datetime.now().isoformat(),
-            title=self.title,
-            comment=self.comment,
+            title=title,
+            comment=comment,
         )
 
         if self.tmp_marker is not None:

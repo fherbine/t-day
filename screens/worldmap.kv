@@ -25,26 +25,16 @@
 
             on_press: mapview.marker_triggered = True
 
-        #AddMeetingMenu:
-        #    pos_hint: {'center_x': .5}
-        #    size_hint_y: .7
-        #    y: -(root.height) if not mapview.add_meeting else 0
-        #    opacity: 1 if mapview.add_meeting else 0
-        #    disabled: True if not mapview.add_meeting else False
-        # button to repositionnate
-
 <AddMarkerButton@ImageButton>:
     source: 'data/images/add_marker.png'
     size_hint: None, None
     size: self.texture_size
 
 <AddMeetingMenu>:
-    title: title.text
-    comment: comment.text
-    level: int(level.spinner_option) if level.spinner_option else 0
     target: None
     tmp_marker: None
     pos_hint: {'x': 1}
+    data: [{'level': 1, 'textinput': False, 'values': ['1', '2', '3'], 'title': 'level'}, {'title': 'title', 'multiline': False, 'textinput': True}, {'title': 'comment', 'multiline': True, 'textinput': True}]
 
     canvas:
         Clear:
@@ -54,7 +44,7 @@
             orientation: 'vertical'
             padding: (dp(20),)
             pos_hint: {'top': 1}
-            size_hint_y: .6
+            size_hint_y: .8
             on_touch_down:
                 touch = args[1]
                 root.target.remove_marker(root.tmp_marker)
@@ -80,27 +70,68 @@
             StyledLabel:
                 bold: True
                 color: rgba('#000000')
-                font_size: sp(26)
+                font_size: sp(20)
                 halign: 'center'
                 text: 'add a meeting :'.upper()
                 text_size: self.width, None
 
-            InputLine:
-                id: level
-                title: 'level:'
-                textinput: False
-                values: ['1', '2', '3']
+            FloatLayout:
+                size_hint_y: 3
 
-            InputLine:
-                id: title
-                title: 'title'
+                RecycleView:
+                    id: recycleview
+                    data: root.data
+                    viewclass: 'InputLine'
+                    bar_color: rgba('#128fbd')
+                    bar_width: dp(5)
+                    pos_hint: {'center': (.5, .5)}
 
-            InputLine:
-                id: comment
-                title: 'comment'
-                multiline: True
+                    RecycleBoxLayout:
+                        id: data_container
+                        default_size: None, dp(self.parent.height / 7.5)
+                        default_size_hint: 1, None
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
+                        spacing: dp(self.parent.height / 25)
+                        padding: dp(30), 0
+
+                Widget:
+                    pos_hint: {'y': 0}
+                    size_hint_y: None
+                    height: dp(50)
+                    opacity: abs(recycleview.scroll_y)
+
+                    canvas.after:
+                        Color:
+                        Rectangle:
+                            source: 'data/images/white_gradient.png'
+                            size: self.size
+                            pos: self.pos
+
+                Widget:
+                    pos_hint: {'top': 1}
+                    size_hint_y: None
+                    height: dp(50)
+                    opacity: abs(1 - recycleview.scroll_y)
+
+                    canvas.before:
+                        PushMatrix:
+                        Rotate:
+                            angle: 180
+                            origin: self.center
+
+                    canvas.after:
+                        Color:
+                        Rectangle:
+                            source: 'data/images/white_gradient.png'
+                            size: self.size
+                            pos: self.pos
+                        PopMatrix:
+
 
             Widget:
+                size_hint_y: .2
 
             BoxLayout:
                 spacing: dp(15)
@@ -136,7 +167,8 @@
         opacity: 1 if root.textinput else 0
         disabled: False if root.textinput else True
         pos_hint: {'center_y': .5}
-        size_hint: (1 if root.textinput else .001), .4 if not root.multiline else .9
+        size_hint: (1 if root.textinput else .001), None
+        height: self.font_size * 1.6 if not root.multiline else self.font_size * 5
 
     StyledSpinner:
         id: spinner
@@ -144,7 +176,8 @@
         opacity: 1 if not root.textinput else 0
         disabled: False if not root.textinput else True
         pos_hint: {'center_y': .5}
-        size_hint: (1 if not root.textinput else .001), .4
+        size_hint: (1 if not root.textinput else .001), None
+        height: self.font_size * 1.6
 
 
 <EventInfoPopup>:
@@ -197,4 +230,4 @@
         pos_hint: {'center': (.5, .5)}
         size_hint: None, None
         size: self.parent.size
-        opacity: abs(cos(2 * app.time)) - .3
+        opacity: abs(cos(2 * app.time))

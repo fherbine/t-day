@@ -64,6 +64,7 @@ FloatLayout:
 <StyledSpinner@FloatLayout>:
     values: []
     text: spinner.text
+    font_size: spinner.font_size
 
     Spinner:
         id: spinner
@@ -71,7 +72,7 @@ FloatLayout:
         option_cls: Factory.StyledSpinnerOption
         values: [value for value in root.values if value != self.text] if root.values and self.text else []
         text: root.values[0] if root.values else ''
-        font_size: sp(19)
+        font_size: sp(16)
         pos_hint: {'center': (.5, .5)}
 
         canvas.before:
@@ -81,7 +82,7 @@ FloatLayout:
                 source: 'data/images/shadow.png'
                 border: 18, 18, 18, 18
                 pos: [xy - dp(4) for xy in self.pos]
-                size: [wh + dp(12) for wh in self.size]
+                size: [wh + dp(8) for wh in self.size]
             Color:
                 rgba: rgba('#f3f3f3')
             Rectangle:
@@ -128,7 +129,7 @@ FloatLayout:
 
 
 <StyledSpinnerOption@SpinnerOption+StyledLabel>:
-    font_size: sp(19)
+    font_size: sp(16)
 
     canvas.before:
         Color:
@@ -150,6 +151,7 @@ FloatLayout:
     focused: False
     text: textinput.text
     multiline: False
+    font_size: textinput.font_size
 
     canvas.before:
         Color:
@@ -157,7 +159,7 @@ FloatLayout:
             source: 'data/images/shadow.png'
             border: 18, 18, 18, 18
             pos: [xy - dp(4) for xy in self.pos]
-            size: [wh + dp(12) for wh in self.size]
+            size: [wh + dp(8) for wh in self.size]
         Color:
             rgba: rgba('#118eba88') if self.focused else rgba('#ebebeb')
         RoundedRectangle:
@@ -180,17 +182,17 @@ FloatLayout:
         foregroud_color: rgba('ff0000')
         text_size: self.width, None
         halign: 'center'
-        font_size: sp(19)
+        font_size: sp(16)
         padding_y: (self.height - self.font_size) / 2 if not self.multiline else 0, 0
         padding_x: dp(20)
         on_focus: root.focused = self.focus
 
 
 <SubmitButton@LabelButton>:
-    font_size: sp(15)
+    font_size: sp(12)
     disabled_color: 1, 1, 1, 1
     size_hint: None, None
-    size: [ts + dp(35) for ts in self.texture_size]
+    size: [ts + dp(10) for ts in self.texture_size]
     opacity: 1 if self.state == 'normal' else .7
 
     canvas.before:

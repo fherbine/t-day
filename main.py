@@ -12,6 +12,9 @@ from kivy.properties import (
     ObjectProperty,
 )
 
+from kivy.core.window import Window
+Window.softinput_mode = 'below_target'  # noqa
+
 import config
 
 from screens import * # noqa
