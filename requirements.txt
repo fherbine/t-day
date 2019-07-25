@@ -1,0 +1,4 @@
+babel
+git+https://github.com/kivy-garden/graph/archive/master.zip
+kivy
+plyer
