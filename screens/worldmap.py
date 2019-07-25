@@ -3,7 +3,12 @@
 Home screen with meetings location and main UX.
 '''
 
-import datetime # Should be temporary to simumlate time
+from datetime import datetime
+
+from babel.dates import (
+    format_date,
+    format_time,
+)
 
 from plyer import gps
 
@@ -85,6 +90,16 @@ class EventInfoPopup(ModalView):
             **meeting.get('data', {}),
             'priority_level': meeting.get('priority_level'),
         }
+
+        if 'datetime' in data:
+            datetm = data['datetime']
+
+            datetm = datetime.fromisoformat(datetm)
+
+            data['date'] = format_date(datetm, locale=app.language)
+            data['time'] = format_time(datetm, locale=app.language)
+
+            del data['datetime']
 
         for key, value in data.items():
             item = EventItemBox()
@@ -275,7 +290,8 @@ class AddMeetingMenu(ModalView):
                 'lat': self.coordinate.lat,
                 'lon': self.coordinate.lon
                 } if self.coordinate else None,
-            datetime=datetime.datetime.now().isoformat(),
+            # Should be temporary to simumlate time
+            datetime=datetime.now().isoformat(),
             title=title,
             comment=comment,
         )
