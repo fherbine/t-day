@@ -1,5 +1,9 @@
-#:import cos math.cos
+#:import CalendarWidget KivyCalendar.CalendarWidget
+#:import CircularTimePicker kivy.garden.circulardatetimepicker.CircularTimePicker
 #:import MapView kivy.garden.mapview.MapView
+#:import cos math.cos
+#:import dates babel.dates
+#:import datetime datetime
 
 <MapScreen>:
     mapview: mapview
@@ -54,15 +58,16 @@
     target: None
     tmp_marker: None
     pos_hint: {'x': 1}
-    data: [{'level': 1, 'textinput': False, 'values': ['1', '2', '3'], 'title': 'level'}, {'title': 'title', 'multiline': False, 'textinput': True}, {'title': 'comment', 'multiline': True, 'textinput': True}]
+    data: add_meeting.data
+    datetime: datetime.datetime.now()
 
     canvas:
         Clear:
 
     FloatLayout:
-        BoxLayout:
-            orientation: 'vertical'
-            padding: (dp(20),)
+
+        ScreenManager:
+            id: screenmanager
             pos_hint: {'top': 1}
             size_hint_y: .8
             on_touch_down:
@@ -87,94 +92,179 @@
                     pos: self.pos
                     size: self.size
 
-            StyledLabel:
-                bold: True
-                color: rgba('#000000')
-                font_size: sp(20)
-                halign: 'center'
-                text: 'add a meeting :'.upper()
-                text_size: self.width, None
+            AddMeetingScreen:
+                id: add_meeting
+                popup: root
+                screenmanager: screenmanager
+                data: [{'level': 1, 'textinput': False, 'values': ['1', '2', '3'], 'title': 'level', 'date_enabled': False}, {'title': 'title', 'multiline': False, 'textinput': True}, {'title': 'comment', 'multiline': True, 'textinput': True}, {'title': 'date', 'date_enabled': True, 'datetime': root.datetime, 'root': self}]
+                name: 'add_meeting'
 
-            FloatLayout:
-                size_hint_y: 3
+            SelectDateScreen:
+                id: select_date
+                popup: root
+                screenmanager: screenmanager
+                name: 'select_date'
+                datetime: ''
 
-                RecycleView:
-                    id: recycleview
-                    data: root.data
-                    viewclass: 'InputLine'
-                    bar_color: rgba('#128fbd')
-                    bar_width: dp(5)
-                    pos_hint: {'center': (.5, .5)}
 
-                    RecycleBoxLayout:
-                        id: data_container
-                        default_size: None, dp(self.parent.height / 7.5)
-                        default_size_hint: 1, None
-                        size_hint_y: None
-                        height: self.minimum_height
-                        orientation: 'vertical'
-                        spacing: dp(self.parent.height / 25)
-                        padding: dp(30), 0
+<AddMeetingScreen@Screen>:
+    popup: None
+    screenmanager: None
+    data: []
 
-                Widget:
-                    pos_hint: {'y': 0}
+    BoxLayout:
+        orientation: 'vertical'
+        padding: (dp(20),)
+
+        StyledLabel:
+            bold: True
+            color: rgba('#000000')
+            font_size: sp(20)
+            halign: 'center'
+            text: 'add a meeting :'.upper()
+            text_size: self.width, None
+
+        FloatLayout:
+            size_hint_y: 3
+
+            RecycleView:
+                id: recycleview
+                data: root.data
+                viewclass: 'InputLine'
+                bar_color: rgba('#128fbd')
+                bar_width: dp(5)
+                pos_hint: {'center': (.5, .5)}
+
+                RecycleBoxLayout:
+                    id: data_container
+                    default_size: None, dp(self.parent.height / 7.5)
+                    default_size_hint: 1, None
                     size_hint_y: None
-                    height: dp(50)
-                    opacity: abs(recycleview.scroll_y)
-
-                    canvas.after:
-                        Color:
-                        Rectangle:
-                            source: 'data/images/white_gradient.png'
-                            size: self.size
-                            pos: self.pos
-
-                Widget:
-                    pos_hint: {'top': 1}
-                    size_hint_y: None
-                    height: dp(50)
-                    opacity: abs(1 - recycleview.scroll_y)
-
-                    canvas.before:
-                        PushMatrix:
-                        Rotate:
-                            angle: 180
-                            origin: self.center
-
-                    canvas.after:
-                        Color:
-                        Rectangle:
-                            source: 'data/images/white_gradient.png'
-                            size: self.size
-                            pos: self.pos
-                        PopMatrix:
-
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(self.parent.height / 25)
+                    padding: dp(30), 0
 
             Widget:
-                size_hint_y: .2
+                pos_hint: {'y': 0}
+                size_hint_y: None
+                height: dp(50)
+                opacity: abs(recycleview.scroll_y)
 
-            BoxLayout:
-                spacing: dp(15)
-                pos_hint: {'center_x': .5}
-                size_hint: None, None
-                size: self.minimum_size
+                canvas.after:
+                    Color:
+                    Rectangle:
+                        source: 'data/images/white_gradient.png'
+                        size: self.size
+                        pos: self.pos
 
-                SubmitButton:
-                    text: 'add event'.upper()
-                    on_release: root.add_meeting()
+            Widget:
+                pos_hint: {'top': 1}
+                size_hint_y: None
+                height: dp(50)
+                opacity: abs(1 - recycleview.scroll_y)
 
-                SubmitButton:
-                    text: 'cancel'.upper()
-                    on_release: root.dismiss()
+                canvas.before:
+                    PushMatrix:
+                    Rotate:
+                        angle: 180
+                        origin: self.center
+
+                canvas.after:
+                    Color:
+                    Rectangle:
+                        source: 'data/images/white_gradient.png'
+                        size: self.size
+                        pos: self.pos
+                    PopMatrix:
+
+
+        Widget:
+            size_hint_y: .2
+
+        BoxLayout:
+            spacing: dp(15)
+            pos_hint: {'center_x': .5}
+            size_hint: None, None
+            size: self.minimum_size
+
+            SubmitButton:
+                text: 'add event'.upper()
+                on_release: root.popup.add_meeting()
+
+            SubmitButton:
+                text: 'cancel'.upper()
+                on_release: root.popup.dismiss()
+
+
+<SelectDateScreen@Screen>:
+    popup: None
+    screenmanager: None
+    data: []
+    default_datetime: datetime.datetime.now()
+    datetime: datetime.datetime.fromisoformat('{date}T{time}.000000'.format(date=calendar.date, time=timepicker.time)) if calendar.date and timepicker.time else None
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: (dp(20),)
+
+        StyledLabel:
+            bold: True
+            color: rgba('#000000')
+            font_size: sp(20)
+            halign: 'center'
+            text: 'add a meeting :'.upper()
+            text_size: self.width, None
+
+        BoxLayout:
+            size_hint_y: 3
+
+            CalendarWidget:
+                id: calendar
+                date: '{year}-{month}-{date}'.format(**{dmy: value if len(str(value)) > 1 else '0' + str(value) for dmy, value in zip(('date', 'month', 'year'), self.active_date)})
+                background_color: .9, .9, .9, 1
+                foreground_color: .2, .2, .2, 1
+
+            CircularTimePicker:
+                id: timepicker
+                time: root.default_datetime.time()
+                color: .2, .2, .2, 1
+                selector_color: 1, 0, 0
+
+        StyledLabel:
+            size_hint_y: .2
+
+        BoxLayout:
+            spacing: dp(15)
+            pos_hint: {'center_x': .5}
+            size_hint: None, None
+            size: self.minimum_size
+
+            SubmitButton:
+                text: 'save date'.upper()
+                on_release:
+                    root.screenmanager.current = 'add_meeting'
+                    root.popup.datetime = root.datetime
+
+            SubmitButton:
+                text: 'cancel'.upper()
+                on_release: root.screenmanager.current = 'add_meeting'
 
 
 <InputLine@BoxLayout>:
     text: textinput.text
     spinner_option: spinner.text
+    date: dateinput.date
     title: ''
     textinput: True
     values: []
     multiline: False
+    date_enabled: False
+    root: None
+    datetime: None
+
+    on_date_enabled:
+        if self.date_enabled: self.textinput = False
 
     StyledLabel:
         text: (root.title).upper()
@@ -193,11 +283,30 @@
     StyledSpinner:
         id: spinner
         values: root.values
-        opacity: 1 if not root.textinput else 0
-        disabled: False if not root.textinput else True
+        opacity: 1 if not root.textinput and not root.date_enabled else 0
+        disabled: False if not root.textinput and not root.date_enabled else True
         pos_hint: {'center_y': .5}
-        size_hint: (1 if not root.textinput else .001), None
+        size_hint: (1 if not root.textinput and not root.date_enabled else .001), None
         height: self.font_size * 1.6
+
+    StyledLabelButton:
+        id: dateinput
+        date: root.datetime
+        color: rgba('#000000')
+        text: '{} - {}'.format(dates.format_date(self.date, locale=app.language), dates.format_time(self.date, locale=app.language))
+        font_size: sp(16)
+        opacity: 1 if root.date_enabled else 0
+        disabled: False if root.date_enabled else True
+        pos_hint: {'center_y': .5}
+        size_hint: (1 if root.date_enabled else .001), None
+        height: self.font_size * 1.6
+        on_press:
+            if root.root and root.root.screenmanager: screenmanager = root.root.screenmanager
+            if screenmanager: screenmanager.current = 'select_date'
+            if screenmanager: screenmanager.current_screen.default_datetime = self.date
+
+
+<StyledLabelButton@ButtonBehavior+StyledLabel>
 
 
 <EventInfoPopup>:

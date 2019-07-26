@@ -278,11 +278,13 @@ class AddMeetingMenu(ModalView):
 
         meetings_controller = app.meetings_controller
 
-        data_container = self.ids.data_container
+        add_meeting_screen = self.ids.add_meeting
+        data_container = add_meeting_screen.ids.data_container
         data = data_container.children
-        title = data[1].text
-        comment = data[0].text
+        title = data[2].text
+        comment = data[1].text
         level = int(data[-1].spinner_option if data[-1].spinner_option else '0')
+        datetm = self.datetime
 
         meetings_controller.add_meeting(
             priority_level=level,
@@ -290,8 +292,7 @@ class AddMeetingMenu(ModalView):
                 'lat': self.coordinate.lat,
                 'lon': self.coordinate.lon
                 } if self.coordinate else None,
-            # Should be temporary to simumlate time
-            datetime=datetime.now().isoformat(),
+            datetime=datetm.isoformat(),
             title=title,
             comment=comment,
         )
